@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Post Favorited - DjangoBlog</title>
+</head>
+<body style="font-family: Arial, sans-serif; background: #f8f9fa; padding: 0; margin: 0;">
+    <div style="max-width: 500px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px 24px;">
+        <h2 style="color: green; margin-top: 0;">You Favorited a Post!</h2>
+        <p style="font-size: 1.1em; color: #333;">Hi {{ user.get_full_name|default:user.username }},</p>
+        <p style="color: #333;">Thank you for favoriting the post <b>"{{ post.title }}"</b> on DjangoBlog.</p>
+        <p style="margin: 24px 0; text-align: center;">
+            <a href="{{ post_url }}" style="background: #0d6efd; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 4px; font-weight: bold; font-size: 1.1em;">View Post</a>
+        </p>
+        <p style="color: #555; font-size: 0.95em;">If you did not favorite this post, you can safely ignore this email.</p>
+        <hr style="margin: 32px 0 16px 0; border: none; border-top: 1px solid #eee;">
+        <div style="color: #888; font-size: 0.9em; text-align: center;">DjangoBlog &copy; {{ year }}</div>
+    </div>
+</body>
+</html>

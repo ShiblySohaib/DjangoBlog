@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="get" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Search favorites..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-outline-primary d-inline-flex align-items-center">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i> Search
+                </button>
+            </form>
+        </div>
+    </div>
+    <h2 class="mb-3"><i class="fa-solid fa-heart"></i> My Favorites</h2>
+    {% if posts %}
+        <div class="list-group">
+            {% for post in posts %}
+                <div class="list-group-item mb-2 position-relative p-0">
+                    <a href="{% url 'posts:post_detail' post.pk %}" class="d-block w-100 text-decoration-none text-dark p-3" style="position:relative; z-index:1;">
+                        <div class="d-flex align-items-center">
+                            <h5 class="mb-1 d-flex align-items-center flex-grow-1">
+                                <i class="fa-regular fa-file-lines me-2"></i> {{ post.title }}
+                            </h5>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fa-solid fa-user"></i> {{ post.author.get_full_name|default:post.author.username }}
+                            &nbsp;|&nbsp;
+                            <i class="fa-solid fa-calendar-days"></i> {{ post.created_at|date:'M d, Y' }}
+                            &nbsp;|&nbsp;
+                            <i class="fa-solid fa-tag"></i> {{ post.get_category_display }}
+                        </small>
+                        <p class="mb-1">{{ post.body|truncatewords:30 }}</p>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No favorites found.</p>
+    {% endif %}
+</div>
+{% endblock %}

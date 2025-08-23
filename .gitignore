@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# Django
+*.sqlite3
+*.db
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.migrations/
+
+# VSCode
+.vscode/
+
+# Pipenv
+Pipfile.lock
+
+# Environments
+.env
+.env.*
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+# Static files (but NOT media/)
+staticfiles/
+static/
+
+# Others
+*.bak
+*.swp
+*.swo
+
+# Ignore compiled translations
+*.mo
+
+# Ignore build
+build/
+dist/

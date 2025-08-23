@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Profile</h3>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{% if 'error' in message.tags %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    <div class="d-flex align-items-end justify-content-between mb-4 position-relative">
+                        {% if editable %}
+                        <a href="{% url 'accounts:favorites_list' %}" class="btn btn-outline-danger" style="height: 40px;">
+                            Favorites <i class="fa-solid fa-heart ms-1"></i>
+                        </a>
+                        {% else %}
+                        <div style="width: 110px;"></div>
+                        {% endif %}
+                        <div style="position: relative; display: inline-block; margin: 0 auto;">
+                            <img id="profile-img-preview" src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}/media/profile_pics/default-profile.jpg{% endif %}" alt="Profile Picture" class="border profile-img-circle" style="width: 140px; height: 140px; aspect-ratio: 1/1; object-fit: cover;">
+                            {% if editable %}
+                            <label for="id_profile_picture" class="profile-img-label" style="position: absolute; bottom: 0; left: 0; width: 100%; text-align: center; background: rgba(255,255,255,0.85); color: #007bff; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; padding: 4px 0; cursor: pointer; opacity: 0; transition: opacity 0.2s; font-weight: 500;">
+                                Change
+                                <input type="file" id="id_profile_picture" name="profile_picture" accept="image/*" style="display: none;" onchange="previewProfileImage(event)">
+                            </label>
+                            {% endif %}
+                        </div>
+                            <a href="{% url 'posts:user_posts' user.id %}" class="btn btn-outline-primary ms-2" style="height: 40px; min-width: 110px; display: flex; align-items: center; justify-content: center;">View Posts <i class="fa-solid fa-list ms-1"></i></a>
+                    </div>
+                    <style>
+                        .profile-img-circle {
+                            border-radius: 50% !important;
+                            width: 100px !important;
+                            height: 100px !important;
+                            aspect-ratio: 1/1;
+                            object-fit: cover;
+                            display: block;
+                        }
+                        .profile-img-label {
+                            pointer-events: none;
+                        }
+                        .profile-img-circle:hover + .profile-img-label,
+                        .profile-img-label:hover {
+                            opacity: 1 !important;
+                            pointer-events: auto;
+                        }
+                        .profile-img-circle:hover {
+                            filter: brightness(0.85);
+                        }
+                        .profile-img-label {
+                            opacity: 0;
+                        }
+                        .profile-img-circle:focus + .profile-img-label {
+                            opacity: 1 !important;
+                            pointer-events: auto;
+                        }
+                    </style>
+                    <script>
+                        function previewProfileImage(event) {
+                            const [file] = event.target.files;
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    document.getElementById('profile-img-preview').src = e.target.result;
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    </script>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="id_first_name" name="first_name" value="{{ user.first_name }}" {% if not editable %}readonly disabled{% endif %}>
+                        </div>
+                        <div class="col">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="id_last_name" name="last_name" value="{{ user.last_name }}" {% if not editable %}readonly disabled{% endif %}>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="id_email" name="email" value="{{ user.email }}" required {% if not editable %}readonly disabled{% endif %}>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="id_bio" name="bio" rows="3" {% if not editable %}readonly disabled{% endif %}>{{ user.bio|default_if_none:"" }}</textarea>
+                    </div>
+                    {% if editable %}
+                    <div class="mb-3">
+                        <a href="/accounts/change-password/" class="btn btn-outline-primary w-100" style="font-size: 1rem;">Change Password</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

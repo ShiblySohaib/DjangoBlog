@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="get" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Search posts..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-outline-primary d-inline-flex align-items-center">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i> Search
+                </button>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'posts:create_post' %}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Create New Post
+            </a>
+        </div>
+    </div>
+    <h2 class="mb-3"><i class="fa-solid fa-list"></i> All Posts</h2>
+    {% if posts %}
+        <div class="list-group">
+            {% for post in posts %}
+                <div class="list-group-item mb-2 position-relative p-0">
+                    <a href="{% url 'posts:post_detail' post.pk %}" class="d-block w-100 text-decoration-none text-dark p-3" style="position:relative; z-index:1;">
+                        <div class="d-flex align-items-center">
+                            <h5 class="mb-1 d-flex align-items-center flex-grow-1">
+                                <i class="fa-regular fa-file-lines me-2"></i> {{ post.title }}
+                            </h5>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fa-solid fa-user"></i> {{ post.author.get_full_name|default:post.author.username }}
+                            &nbsp;|&nbsp;
+                            <i class="fa-solid fa-calendar-days"></i> {{ post.created_at|date:'M d, Y' }}
+                            &nbsp;|&nbsp;
+                            <i class="fa-solid fa-tag"></i> {{ post.get_category_display }}
+                        </small>
+                        <p class="mb-1">{{ post.body|truncatewords:30 }}</p>
+                    </a>
+                    <div class="position-absolute top-0 end-0 m-2 d-flex align-items-center" style="z-index:2;">
+                        <div class="d-flex align-items-center justify-content-center me-2 favorite-box {% if user in post.favorited_by.all %}favorited{% endif %}" style="width:32px; height:32px; padding:0; background:{% if user in post.favorited_by.all %}#dc3545{% else %}#fff{% endif %}; border:1px solid {% if user in post.favorited_by.all %}#dc3545{% else %}#dee2e6{% endif %}; border-radius:0.375rem;">
+                            <form method="post" action="{% url 'posts:toggle_favorite' post.pk %}" class="favorite-form" data-post-id="{{ post.pk }}" style="margin-bottom:0;">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-link p-0 favorite-btn" style="font-size:1.1rem; color: {% if user in post.favorited_by.all %}#fff{% else %}#adb5bd{% endif %}; line-height:1; height:28px; width:28px; display:flex; align-items:center; justify-content:center; text-decoration:none; outline:none; box-shadow:none;" aria-label="Favorite">
+                                    {% if user in post.favorited_by.all %}
+                                        <i class="fa-solid fa-heart"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-heart" style="font-weight:400;"></i>
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
+                        {% if user.is_superuser or user == post.author %}
+                            <a href="{% url 'posts:edit_post' post.pk %}" class="btn btn-sm btn-warning me-1"><i class="fa-solid fa-pen"></i> Edit</a>
+                            <a href="{% url 'posts:delete_post' post.pk %}" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No posts found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+document.querySelectorAll('.favorite-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const form = btn.closest('.favorite-form');
+        const postId = form.getAttribute('data-post-id');
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.favorited) {
+                btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                btn.style.color = '#fff';
+                btn.closest('.favorite-box').style.background = '#dc3545';
+                btn.closest('.favorite-box').style.borderColor = '#dc3545';
+            } else {
+                btn.innerHTML = '<i class="fa-regular fa-heart" style="font-weight:400;"></i>';
+                btn.style.color = '#adb5bd';
+                btn.closest('.favorite-box').style.background = '#fff';
+                btn.closest('.favorite-box').style.borderColor = '#dee2e6';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
