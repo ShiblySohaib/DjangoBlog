@@ -8,6 +8,7 @@ django = "*"
 django-environ = "*"
 pillow = "*"
 gunicorn = "*"
+whitenoise = "*"
 
 [dev-packages]
 
